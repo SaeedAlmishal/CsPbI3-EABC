@@ -1,5 +1,4 @@
-# Input file for initial trial on Perovskites
-# Saeed Sameer, June 2020
+# Saeed Almishal, June 2020
 
 # ----------------------- ATOM PROPERTIES ----------------------------
 
@@ -10,7 +9,7 @@ dimension	3
 boundary	p	p	p
 atom_style	charge
 
-read_data in.final.txt
+read_data in.structure.txt
 
 set type 1 charge  1.36
 set type 2 charge 2.03

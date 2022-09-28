@@ -1,0 +1,283 @@
+# Input file for initial trial on Perovskites
+# Saeed Sameer, June 2020
+
+# ----------------------- ATOM PROPERTIES ----------------------------
+
+# ------------------------ INITIALIZATION ----------------------------
+
+units 		metal
+dimension	3
+boundary	p	p	p
+atom_style	charge
+
+read_data in.final.txt
+
+set type 1 charge  1.36
+set type 2 charge 2.03
+set type 3 charge -1.13
+
+# ------------------- FORCE FIELDS Bucks Potential  ----------------------
+pair_style hybrid/overlay eam/fs eam/fs buck/coul/cut 12.0 12.0 coul/cut 12.0
+
+pair_coeff	* * eam/fs 1            Cs.eam.fs Cs NULL NULL                        #Cs-Cs
+pair_coeff      1 1 coul/cut     
+
+pair_coeff	1 2 buck/coul/cut     3.3068438e11      0.10519      480.68           #Cs-Pb
+
+pair_coeff	1 3 buck/coul/cut     4913.000          0.3814       480.060          #Cs-I
+
+pair_coeff	* * eam/fs 2            Pb.eam.fs NULL Pb NULL                        #Pb-Pb
+pair_coeff      2 2 coul/cut     
+
+pair_coeff	2 3 buck/coul/cut     4488.05560237     0.321737     0.0              #Pb-I
+pair_coeff	3 3 buck/coul/cut     988.421189704     0.482217     30.2228518648    #I-I
+
+
+# ------------------- Property Computes  ----------------------
+#compute peratom all pe/atom
+compute 1 all pe
+compute 2 all ke
+compute virial all stress/atom NULL
+compute myRDF all rdf 1000 1 1 2 2 3 3 1 2 1 3 2 3 
+
+# ------------------- Equilibration ----------------------
+# Set time step
+reset_timestep	0
+timestep 0.00005
+
+# Set temperature 
+velocity all create 300 12345 
+
+# Assign fixes
+fix 1 all npt temp 300 300 $(100.0*dt) iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		1 all custom 10000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 500000
+unfix 1
+undump 1
+
+fix 7 all ave/time 2 1 2 c_myRDF[*] file Ardf300.dat mode vector
+run 2
+unfix 7
+
+################################## 2
+reset_timestep	0
+timestep 0.00005
+# Assign fixes
+fix 2 all npt temp 300 300 1 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		2 all custom 10000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 100000
+unfix 2
+undump 2
+
+fix 8 all ave/time 2 1 2 c_myRDF[*] file Ardf2300.dat mode vector
+run 2
+unfix 8
+
+################################## 3A
+# Assign fixes
+fix 3 all npt temp 400 400 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		3 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 3
+undump 3
+
+fix 9 all ave/time 2 1 2 c_myRDF[*] file Ardf400.dat mode vector
+run 2
+unfix 9
+
+################################## 3B
+# Assign fixes
+fix 33 all npt temp 500 500 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		33 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 33
+undump 33
+
+fix 10 all ave/time 2 1 2 c_myRDF[*] file Ardf500.dat mode vector
+run 2
+unfix 10
+
+################################## 4
+# Assign fixes
+fix 4 all npt temp 600 600 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		4 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 4
+undump 4
+
+fix 11 all ave/time 2 1 2 c_myRDF[*] file Ardf600.dat mode vector
+run 2
+unfix 11
+
+
+################################## 4B
+# Assign fixes
+fix 44 all npt temp 700 700 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		44 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 44
+undump 44
+
+fix 12 all ave/time 2 1 2 c_myRDF[*] file Ardf700.dat mode vector
+run 2
+unfix 12
+
+################################## 4C
+# Assign fixes
+fix 444 all npt temp 800 800 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		444 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 444
+undump 444
+
+fix 13 all ave/time 2 1 2 c_myRDF[*] file Ardf800.dat mode vector
+run 2
+unfix 13
+
+################################## 5A
+# Assign fixes
+fix 5 all npt temp 900 900 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		5 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 5
+undump 5
+
+fix 14 all ave/time 2 1 2 c_myRDF[*] file Ardf900.dat mode vector
+run 2
+unfix 14
+
+################################## 5B
+# Assign fixes
+fix 55 all npt temp 1000 1000 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		55 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 55
+undump 55
+
+fix 15 all ave/time 2 1 2 c_myRDF[*] file Ardf1000.dat mode vector
+run 2
+unfix 15
+
+################################## 6A
+# Assign fixes
+fix 6 all npt temp 1100 1100 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		6 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 6
+undump 6
+
+fix 16 all ave/time 2 1 2 c_myRDF[*] file Ardf1100.dat mode vector
+run 2
+unfix 16
+
+################################## 6B
+# Assign fixes
+fix 66 all npt temp 1200 1200 3 iso 1.01325 1.01325 1 drag 1        # 1 recommended damping for unwanted vibration 
+
+# Set thermo output
+thermo          100                                    #Number of time steps
+thermo_style    custom step lx ly lz press pxx pyy pzz temp etotal pe ke density enthalpy
+
+# Use custom dump for Ovito Output
+dump 		66 all custom 1000 CsPbI3T*.dump id type x y z fx fy fz
+
+# Run
+run 960000
+unfix 66
+undump 66
+
+fix 17 all ave/time 2 1 2 c_myRDF[*] file Ardf1200.dat mode vector
+run 2
+unfix 17
+
+
+# Store final cell length for strain calculations
+variable tmp equal "lx"
+variable L0 equal ${tmp}
+print "Initial Length, L0: ${L0}"
+
+######################################
+# SIMULATION DONE
+print "All done"
+
+
